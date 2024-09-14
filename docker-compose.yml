@@ -1,0 +1,41 @@
+version: '3'
+
+services:
+  kong-database:
+    image: postgres:alpine
+    restart: always
+    environment:
+      POSTGRES_DB: kong
+      POSTGRES_USER: kong
+      POSTGRES_PASSWORD: kong
+    volumes:
+      - kong-db:/var/lib/postgresql/data
+
+  kong:
+    image: kong:latest
+    restart: always
+    depends_on:
+      - kong-database
+    ports:
+      - "8000:8000"  # Public gateway
+      - "8001:8001"  # Admin API
+    environment:
+      KONG_DATABASE: postgres
+      KONG_PG_HOST: kong-database
+      KONG_PG_PORT: 5432
+      KONG_PG_USER: kong
+      KONG_PG_PASSWORD: kong
+
+  konga:
+    image: pantsel/konga:latest
+    restart: always
+    depends_on:
+      - kong
+    ports:
+      - "1337:1337"
+    environment:
+      DB_ADAPTER: postgres
+      DB_URI: postgres://kong:kong@kong-database:5432/kong
+
+volumes:
+  kong-db:
