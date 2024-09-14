@@ -12,6 +12,8 @@ services:
       POSTGRES_PASSWORD: kongpass
     ports:
       - "5432:5432"
+    volumes:
+      - ./backup.sql:/docker-entrypoint-initdb.d/backup.sql
 
   kong:
     image: kong/kong-gateway:3.8.0.0
