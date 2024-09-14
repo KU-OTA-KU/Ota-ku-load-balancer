@@ -20,6 +20,7 @@ services:
       - kong-net
     depends_on:
       - postgres
+      - kong-init
     environment:
       KONG_DATABASE: postgres
       KONG_PG_HOST: kong-database
@@ -40,6 +41,20 @@ services:
       - "8445:8445"
       - "8003:8003"
       - "8004:8004"
+
+  kong-init:
+    image: kong/kong-gateway:3.8.0.0
+    container_name: kong-init
+    networks:
+      - kong-net
+    entrypoint: [ "/bin/sh", "-c", "kong migrations bootstrap" ]
+    environment:
+      KONG_DATABASE: postgres
+      KONG_PG_HOST: kong-database
+      KONG_PG_USER: kong
+      KONG_PG_PASSWORD: kongpass
+    depends_on:
+      - postgres
 
 networks:
   kong-net:

@@ -2,7 +2,8 @@
 
 docker network create kong-net
 
-Yaml file 
+Yaml file
+
 ```yaml
 version: '3.8'
 
@@ -51,5 +52,7 @@ networks:
   kong-net:
     driver: bridge
 ```
+
+docker-compose up kong-init
 
 docker-compose up -d
