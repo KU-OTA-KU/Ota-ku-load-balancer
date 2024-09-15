@@ -6,9 +6,13 @@ Create a network for containers:
 ```bash
 docker network create kong-net
 ```
+Email:    admin@example.com
+Password: changeme
 
 Run all containers in the background:
 ```bash
+docker-compose run kong kong migrations bootstrap
+
 docker-compose up -d
 ```
 

@@ -1,9 +1,9 @@
 version: '3.8'
 
 services:
-  postgres:
+  db:
     image: postgres:13
-    container_name: kong-database
+    container_name: api-gateway-db
     networks:
       - kong-net
     environment:
@@ -11,24 +11,29 @@ services:
       POSTGRES_DB: kong
       POSTGRES_PASSWORD: kongpass
     ports:
-      - "5432:5432"
+      - "49152:5432"
     volumes:
-      - ./backup.sql:/docker-entrypoint-initdb.d/backup.sql
-  redis:
-    image: redis:alpine
-    container_name: kong-cache
+      - ./tmp/db:/var/lib/postgresql/data
+
+  cache:
+    image: redis:latest
+    container_name: api-gateway-redis
     networks:
       - kong-net
-  kong:
-    image: kong/kong-gateway:3.8.0.0
-    container_name: kong-gateway
+    volumes:
+      - ./tmp/cache:/var/lib/postgresql/data
+
+  app:
+    image: kong:latest
+    container_name: api-gateway
     networks:
       - kong-net
     depends_on:
-      - postgres
+      - db
+      - cache
     environment:
       KONG_DATABASE: postgres
-      KONG_PG_HOST: kong-database
+      KONG_PG_HOST: api-gateway-db
       KONG_PG_USER: kong
       KONG_PG_PASSWORD: kongpass
       KONG_PROXY_ACCESS_LOG: /dev/stdout
